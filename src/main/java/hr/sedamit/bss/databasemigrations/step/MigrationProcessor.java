@@ -1,7 +1,5 @@
 package hr.sedamit.bss.databasemigrations.step;
 
-import hr.sedamit.bss.databasemigrations.postgre.entity.T1;
-import hr.sedamit.bss.databasemigrations.sqlserver.entity.SqlServerEntity;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Value;

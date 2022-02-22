@@ -1,8 +1,6 @@
 package hr.sedamit.bss.databasemigrations.configuration;
 
 import hr.sedamit.bss.databasemigrations.listener.JobCompletionNotificationListener;
-import hr.sedamit.bss.databasemigrations.postgre.entity.T1;
-import hr.sedamit.bss.databasemigrations.sqlserver.entity.SqlServerEntity;
 import hr.sedamit.bss.databasemigrations.step.MigrationProcessor;
 import hr.sedamit.bss.databasemigrations.step.PostgreWriter;
 import hr.sedamit.bss.databasemigrations.step.SqlServerReader;
@@ -14,7 +12,6 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
