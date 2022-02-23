@@ -146,10 +146,6 @@ public class DatabaseUtilService {
 
 		List<Map<String, Object>> result = nativedatatypeQuery.getResultList();
 
-		// result =
-		// sourceJdbcTemplate.queryForList(SqlTableMetadata.getTableInformationQuery(shemaName,
-		// tableName, sourceDatabaseType));
-
 		if (result == null || result.size() < 1) {
 			LOGGER.info("Table = " + shemaName + "." + tableName + " not exists or error occured. Check sql query");
 			return null;

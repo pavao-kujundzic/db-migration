@@ -19,21 +19,21 @@ import hr.sedamit.bss.databasemigrations.util.common.DatabaseType;
  *
  */
 @Service
-public class CopyDatabaseService {
+public class DatabaseService {
 
 	@PersistenceContext
-	private EntityManager sourcEntityManager;
+	private EntityManager sourceEntityManager;
 
 	@Autowired
-	@Qualifier("sqlServerJdbcTemplate")
+	@Qualifier("sourceJdbcTemplate")
 	JdbcTemplate sourceJdbcTemplate;
 
 	@Autowired
-	@Qualifier("postgreSqlJdbcTemplate")
+	@Qualifier("destinationJdbcTemplate")
 	JdbcTemplate destinationJdbcTemplate;
 
 	public void createTable() throws Exception {
-		DatabaseUtilService service = new DatabaseUtilService(sourcEntityManager, sourceJdbcTemplate,
+		DatabaseUtilService service = new DatabaseUtilService(sourceEntityManager, sourceJdbcTemplate,
 				destinationJdbcTemplate, "billing", "payment_order", DatabaseType.MSSQL,
 				DatabaseType.POSTGRE);
 
