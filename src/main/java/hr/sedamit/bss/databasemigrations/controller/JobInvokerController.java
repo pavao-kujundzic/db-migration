@@ -1,7 +1,6 @@
 package hr.sedamit.bss.databasemigrations.controller;
 
 
-
 import hr.sedamit.bss.databasemigrations.service.JobInvokerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

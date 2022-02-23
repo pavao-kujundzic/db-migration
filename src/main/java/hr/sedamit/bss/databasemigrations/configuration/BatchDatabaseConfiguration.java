@@ -47,6 +47,7 @@ public class BatchDatabaseConfiguration {
     @Qualifier("batchDataSource")
     public DataSource batchDataSource() throws SQLException {
         DriverManagerDataSource driver = new DriverManagerDataSource();
+
         driver.setDriverClassName(env.getProperty("batch.datasource.driver"));
         driver.setUrl(env.getProperty("batch.datasource.jdbcUrl"));
         driver.setUsername(env.getProperty("batch.datasource.username"));

@@ -1,6 +1,6 @@
 package hr.sedamit.bss.databasemigrations.step;
 
-
+import hr.sedamit.bss.databasemigrations.postgre.entity.T1;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
