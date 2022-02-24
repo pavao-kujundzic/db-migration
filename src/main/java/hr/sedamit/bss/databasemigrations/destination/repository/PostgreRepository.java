@@ -1,7 +1,8 @@
-package hr.sedamit.bss.databasemigrations.postgre.repository;
+package hr.sedamit.bss.databasemigrations.destination.repository;
 
-import hr.sedamit.bss.databasemigrations.postgre.entity.T1;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import hr.sedamit.bss.databasemigrations.destination.entity.T1;
 
 public interface PostgreRepository extends JpaRepository<T1, Integer> {
 

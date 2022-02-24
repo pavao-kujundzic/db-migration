@@ -1,54 +1,68 @@
 package hr.sedamit.bss.databasemigrations.step;
 
-import hr.sedamit.bss.databasemigrations.postgre.entity.T1;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import hr.sedamit.bss.databasemigrations.util.DatabaseUtilService;
 
 @Component
 @StepScope
 public class PostgreWriter implements ItemWriter<Map<String, List<Map<String, Object>>>> {
 
-    @Autowired
-    @Qualifier("postgreSqlJdbcTemplate")
-    JdbcTemplate postgreSqlJdbcTemplate;
+	private final static Logger LOGGER = LoggerFactory.getLogger(PostgreWriter.class);
 
-    @Value("#{jobParameters['updateTables']}")
-    private String updateTablesString;
+	@Autowired
+	private Environment env;
 
-    @Value("#{jobParameters['appendTables']}")
-    private String appendTablesString;
+	@Autowired
+	@Qualifier("sourceJdbcTemplate")
+	JdbcTemplate sourceJdbcTemplate;
 
-    @Override
-    public void write(List<? extends Map<String, List<Map<String, Object>>>> data) throws Exception {
-        List<String> appendTables = Arrays.asList(appendTablesString.split("\\s*,\\s*"));
-        List<String> updateTables = Arrays.asList(updateTablesString.split("\\s*,\\s*"));
+	@Autowired
+	@Qualifier("destinationJdbcTemplate")
+	JdbcTemplate destinationJdbcTemplate;
 
-        Map<String, List<Map<String, Object>>> items = data.get(0);
+	@Value("#{jobParameters['updateTables']}")
+	private String updateTablesString;
 
-        List<Map<String, Object>> table = items.get(appendTables.get(0));
-        Map<String, Object> rows = table.get(0);
+	@Value("#{jobParameters['appendTables']}")
+	private String appendTablesString;
 
+	@Override
+	public void write(List<? extends Map<String, List<Map<String, Object>>>> data) throws Exception {
+		LOGGER.info("writer start...");
+		for (Map<String, List<Map<String, Object>>> job : data) {
+			for (Entry<String, List<Map<String, Object>>> table : job.entrySet()) {
+				String[] name = table.getKey() != null ? table.getKey().split(".") : null;
+				if (name != null && name.length > 1) {
+					String tableName = name[1];
+					String schemaName = name[0];
 
-        StringBuilder stringBuilder = new StringBuilder();
-        String query = stringBuilder.append("INSERT INTO " + appendTables.get(0))
-                .append(rows.keySet() + " ")
-                .append(" VALUES")
-                .append(rows.values().toString()).append(";")
-                .toString()
-                .replace("[", "(")
-                .replace("]", ")");
+					DatabaseUtilService service = new DatabaseUtilService(
+							env.getProperty("batch.destination.datasource.driver"),
+							env.getProperty("batch.source.datasource.driver"),
+							sourceJdbcTemplate,
+							destinationJdbcTemplate,
+							schemaName,
+							tableName);
 
-
-        System.out.println(query);
-
-    }
+					service.createTable(false);
+					service.insertDataMap(table.getValue());
+				}
+			}
+		}
+		LOGGER.info("writer end...");
+	}
 }

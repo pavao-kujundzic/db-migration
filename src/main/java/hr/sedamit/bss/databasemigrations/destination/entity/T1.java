@@ -1,4 +1,4 @@
-package hr.sedamit.bss.databasemigrations.postgre.entity;
+package hr.sedamit.bss.databasemigrations.destination.entity;
 
 import lombok.Data;
 

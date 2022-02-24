@@ -5,6 +5,8 @@ package hr.sedamit.bss.databasemigrations.util.mssql;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -142,6 +144,28 @@ public class MsSqlTable extends SqlTable {
 		String query = "CREATE SCHEMA ";
 		query = query.concat("IF NOT EXISTS ");
 		query = query.concat(schemaName);
+		return query;
+	}
+
+	@Override
+	public String generateInsertDataMap(List<Map<String, Object>> value) {
+		String fieldSqlString = "(";
+		String dataSqlString = "(";
+
+		for (Map<String, Object> map : value) {
+			for (Entry<String, Object> entry : map.entrySet()) {
+				fieldSqlString = fieldSqlString.concat(entry.getKey()).concat(", ");
+				dataSqlString = dataSqlString.concat(entry.getKey()).concat(", ");
+			}
+		}
+		fieldSqlString = fieldSqlString.substring(0, fieldSqlString.length() - 2);
+		dataSqlString = dataSqlString.substring(0, dataSqlString.length() - 2);
+		fieldSqlString = fieldSqlString.concat(") ");
+		dataSqlString = dataSqlString.concat(") ");
+
+		String query = "insert into " + this.schemaName + "." + this.tableName + fieldSqlString + "values "
+				+ dataSqlString;
+
 		return query;
 	}
 

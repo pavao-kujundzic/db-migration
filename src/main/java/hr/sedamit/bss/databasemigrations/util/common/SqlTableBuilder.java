@@ -62,7 +62,7 @@ public class SqlTableBuilder {
 						: null);
 		sqlTableColumn.setNumericPrecision(
 				column.get(SqlTableMetadata.getNumericPrecision(sourceDatabaseType)) != null
-						? (Byte) column.get(SqlTableMetadata.getNumericPrecision(sourceDatabaseType))
+						? column.get(SqlTableMetadata.getNumericPrecision(sourceDatabaseType))
 						: null);
 		sqlTableColumn.setIsNullable(
 				column.get(SqlTableMetadata.getIsNullable(sourceDatabaseType)) != null

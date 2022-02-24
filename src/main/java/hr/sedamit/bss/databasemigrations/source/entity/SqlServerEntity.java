@@ -1,4 +1,4 @@
-package hr.sedamit.bss.databasemigrations.sqlserver.entity;
+package hr.sedamit.bss.databasemigrations.source.entity;
 
 import lombok.Data;
 

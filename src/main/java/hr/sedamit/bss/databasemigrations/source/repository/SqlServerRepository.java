@@ -1,7 +1,8 @@
-package hr.sedamit.bss.databasemigrations.sqlserver.repository;
+package hr.sedamit.bss.databasemigrations.source.repository;
 
-import hr.sedamit.bss.databasemigrations.sqlserver.entity.SqlServerEntity;
 import org.springframework.data.repository.CrudRepository;
+
+import hr.sedamit.bss.databasemigrations.source.entity.SqlServerEntity;
 
 public interface SqlServerRepository extends CrudRepository<SqlServerEntity, Long> {
 

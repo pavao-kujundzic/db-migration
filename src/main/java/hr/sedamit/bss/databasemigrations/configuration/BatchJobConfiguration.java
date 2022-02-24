@@ -1,8 +1,8 @@
 package hr.sedamit.bss.databasemigrations.configuration;
 
+import hr.sedamit.bss.databasemigrations.destination.entity.T1;
 import hr.sedamit.bss.databasemigrations.listener.JobCompletionNotificationListener;
-import hr.sedamit.bss.databasemigrations.postgre.entity.T1;
-import hr.sedamit.bss.databasemigrations.sqlserver.entity.SqlServerEntity;
+import hr.sedamit.bss.databasemigrations.source.entity.SqlServerEntity;
 import hr.sedamit.bss.databasemigrations.step.MigrationProcessor;
 import hr.sedamit.bss.databasemigrations.step.PostgreWriter;
 import hr.sedamit.bss.databasemigrations.step.SqlServerReader;

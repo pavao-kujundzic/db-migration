@@ -6,11 +6,6 @@ package hr.sedamit.bss.databasemigrations.util;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-
-import org.hibernate.query.internal.NativeQueryImpl;
-import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -32,7 +27,8 @@ import lombok.Data;
 public class DatabaseUtilService {
 	private final static Logger LOGGER = LoggerFactory.getLogger(DatabaseUtilService.class);
 
-	private EntityManager sourcEntityManager;
+	private String destinationDriverName;
+	private String sourceDriverName;
 	private JdbcTemplate sourceJdbcTemplate;
 	private JdbcTemplate destinationJdbcTemplate;
 
@@ -52,18 +48,34 @@ public class DatabaseUtilService {
 	 * @param destinationDatabase
 	 * @throws Exception
 	 */
-	public DatabaseUtilService(EntityManager sourcEntityManager, JdbcTemplate sourceJdbcTemplate,
-			JdbcTemplate destinationJdbcTemplate, String sourceSchema, String sourceTable, DatabaseType sourceDatabase,
-			DatabaseType destinationDatabase) throws Exception {
+	public DatabaseUtilService(String destinationDriverName, String sourceDriverName,
+			JdbcTemplate sourceJdbcTemplate,
+			JdbcTemplate destinationJdbcTemplate, String sourceSchema, String sourceTable) throws Exception {
 		super();
-		this.sourcEntityManager = sourcEntityManager;
+		this.destinationDriverName = destinationDriverName;
+		this.sourceDriverName = sourceDriverName;
 		this.sourceJdbcTemplate = sourceJdbcTemplate;
 		this.destinationJdbcTemplate = destinationJdbcTemplate;
 		this.sourceSchema = sourceSchema;
 		this.sourceTable = sourceTable;
-		this.sourceDatabaseType = sourceDatabase;
-		this.destinationDatabaseType = destinationDatabase;
+		this.sourceDatabaseType = getDatabaseType(sourceDriverName);
+		this.destinationDatabaseType = getDatabaseType(destinationDriverName);
 		this.destinationTable = init();
+	}
+
+	/**
+	 * @param destinationEntityManager2
+	 * @return
+	 */
+	private DatabaseType getDatabaseType(String driverName) {
+
+		if (driverName.equalsIgnoreCase("org.postgresql.Driver")) {
+			return DatabaseType.POSTGRE;
+		} else if (driverName.equalsIgnoreCase("com.microsoft.sqlserver.jdbc.SQLServerDriver")) {
+			return DatabaseType.MSSQL;
+		}
+
+		return null;
 	}
 
 	/**
@@ -130,6 +142,17 @@ public class DatabaseUtilService {
 		return true;
 	}
 
+	public boolean insertDataMap(List<Map<String, Object>> data) {
+		try {
+			String insertString = this.destinationTable.generateInsertDataMap(data);
+			destinationJdbcTemplate.execute(insertString);
+		} catch (DataAccessException e) {
+			return false;
+		}
+
+		return true;
+	}
+
 	/**
 	 * Dohvati informacije o stupcima
 	 * 
@@ -138,13 +161,8 @@ public class DatabaseUtilService {
 	 */
 	private List<Map<String, Object>> getTableDetails(String shemaName, String tableName,
 			DatabaseType sourceDatabaseType) {
-		Query datatypes = sourcEntityManager
-				.createNativeQuery(SqlTableMetadata.getTableInformationQuery(shemaName, tableName, sourceDatabaseType));
-
-		NativeQueryImpl nativedatatypeQuery = (NativeQueryImpl) datatypes;
-		nativedatatypeQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
-
-		List<Map<String, Object>> result = nativedatatypeQuery.getResultList();
+		List<Map<String, Object>> result = sourceJdbcTemplate
+				.queryForList(SqlTableMetadata.getTableInformationQuery(shemaName, tableName, sourceDatabaseType));
 
 		if (result == null || result.size() < 1) {
 			LOGGER.info("Table = " + shemaName + "." + tableName + " not exists or error occured. Check sql query");
@@ -153,4 +171,5 @@ public class DatabaseUtilService {
 
 		return result;
 	}
+
 }

@@ -4,6 +4,7 @@
 package hr.sedamit.bss.databasemigrations.util.common;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by J0ka on 23/02/22
@@ -18,4 +19,6 @@ public interface SqlMethods {
 	public List<String> generateListOfTableInsertQuery(List<Object[]> inserDatas);
 
 	public String generateTableInsertQuery(Object[] inserDatas);
+
+	public String generateInsertDataMap(List<Map<String, Object>> value);
 }

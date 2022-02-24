@@ -16,7 +16,7 @@ public class SqlTableColumn {
 	private String dataType;
 	private Integer ordinalPosition;
 	private Integer numericScale;
-	private Byte numericPrecision;
+	private Object numericPrecision;
 	private Integer characterMaximumLength;
 
 	public SqlTableColumn() {

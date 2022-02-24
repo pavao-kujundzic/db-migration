@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -25,14 +24,13 @@ public class SourceDatabaseConfiguration {
 	@Autowired
 	Environment env;
 
-	@Primary
 	@Bean(name = "sourceEntityManagerFactory")
 	@Autowired
 	public LocalContainerEntityManagerFactoryBean sourceEntityManagerFactory(
 			@Qualifier("sourceDataSource") DataSource sourceDataSource) {
 		LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
 		em.setJtaDataSource(sourceDataSource);
-		em.setPackagesToScan("hr.sedamit.bss.databasemigrations.sqlserver.entity");
+		em.setPackagesToScan("hr.sedamit.bss.databasemigrations.source.entity");
 
 		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
 		em.setJpaVendorAdapter(vendorAdapter);
@@ -44,7 +42,6 @@ public class SourceDatabaseConfiguration {
 		return em;
 	}
 
-	@Primary
 	@Bean(name = "sourceDataSource")
 	public DataSource sourceDataSource() throws SQLException {
 		DriverManagerDataSource driver = new DriverManagerDataSource();
@@ -55,7 +52,6 @@ public class SourceDatabaseConfiguration {
 		return driver;
 	}
 
-	@Primary
 	@Bean
 	@Qualifier("sourceJdbcTemplate")
 	public JdbcTemplate sourceJdbcTemplate(@Qualifier("sourceDataSource") DataSource sourceDataSource) {
