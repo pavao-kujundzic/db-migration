@@ -22,7 +22,7 @@ public class JobInvokerController {
 	private DatabaseService service;
 
 	@GetMapping("/migrate")
-	public String importCodebooks(@RequestParam List<String> appendTables, @RequestParam List<String> updateTables)
+	public String importCodebooks(@RequestParam(required = false) List<String> appendTables, @RequestParam(required = false) List<String> updateTables)
 			throws Exception {
 		return jobInvokerService.invokeJob(appendTables, updateTables);
 	}

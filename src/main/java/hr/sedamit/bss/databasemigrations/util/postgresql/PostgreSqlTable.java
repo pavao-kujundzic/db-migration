@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import hr.sedamit.bss.databasemigrations.batch.model.TableBatchConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +55,11 @@ public class PostgreSqlTable extends SqlTable {
 		LOGGER.debug("Generated table insert query:: " + query);
 
 		return query;
+	}
+
+	@Override
+	public String generateSelectQuery(String schema, String table, TableBatchConfiguration tableBatchConfiguration) {
+		return null;
 	}
 
 	@Override

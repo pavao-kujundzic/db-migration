@@ -21,8 +21,10 @@ public class JobInvokerService {
 
     public String invokeJob(List<String> appendTables, List<String> updateTables) throws Exception {
 
-        String appendTablesString = String.join(",", appendTables);
-        String updateTablesString = String.join(",", updateTables);
+        String appendTablesString = appendTables != null ? String.join(",", appendTables) : "";
+        String updateTablesString = updateTables != null ? String.join(",", updateTables) : "";
+
+
         JobParameters jobParametersBuilder = new JobParametersBuilder()
                 .addString("appendTables", appendTablesString)
                 .addString("updateTables", updateTablesString)

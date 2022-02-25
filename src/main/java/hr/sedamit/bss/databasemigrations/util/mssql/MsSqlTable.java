@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package hr.sedamit.bss.databasemigrations.util.mssql;
 
@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import hr.sedamit.bss.databasemigrations.batch.model.TableBatchConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,147 +27,177 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class MsSqlTable extends SqlTable {
-	private final static Logger LOGGER = LoggerFactory.getLogger(MsSqlTable.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(MsSqlTable.class);
 
-	public Integer getNumberOfColumns() {
-		return this.columns.size();
-	}
+    public Integer getNumberOfColumns() {
+        return this.columns.size();
+    }
 
-	@Override
-	public String generateTableInsertQuery(Object[] insertData) {
+    @Override
+    public String generateTableInsertQuery(Object[] insertData) {
 
-		String values = "";
-		for (Object str : insertData) {
-			if (str == null) {
-				values = values.concat("null").concat(", ");
-			} else if (str instanceof Number) {
-				values = values.concat(str.toString()).concat(", ");
-			} else {
-				values = values.concat("'" + str.toString() + "'").concat(", ");
-			}
-		}
+        String values = "";
+        for (Object str : insertData) {
+            if (str == null) {
+                values = values.concat("null").concat(", ");
+            } else if (str instanceof Number) {
+                values = values.concat(str.toString()).concat(", ");
+            } else {
+                values = values.concat("'" + str.toString() + "'").concat(", ");
+            }
+        }
 
-		values = values.substring(0, values.length() - 2);
+        values = values.substring(0, values.length() - 2);
 
-		String query = "insert into " + this.schemaName + "." + this.tableName + " values (";
+        String query = "insert into " + this.schemaName + "." + this.tableName + " values (";
 
-		query = query.concat(values);
-		query = query.concat(") ");
+        query = query.concat(values);
+        query = query.concat(") ");
 
-		return query;
-	}
+        return query;
+    }
 
-	@Override
-	public List<String> generateListOfTableInsertQuery(List<Object[]> inserDatas) {
-		List<String> inserts = new ArrayList<>();
-		for (Object[] data : inserDatas) {
-			inserts.add(generateTableInsertQuery(data));
-		}
 
-		return inserts;
-	}
+    public static String generateSelectQuerys(String schema, String tableName, TableBatchConfiguration tableBatchConfiguration) {
+        String select = "SELECT ";
+        Integer batchSize = tableBatchConfiguration.getBatchSize();
+        String numberOfRows = (batchSize.equals(null) || batchSize <= 0) ? " " : "TOP " + batchSize;
+        String all = " * ";
+        String from = "FROM ";
+        String table = schema + "." + tableName;
+        String where = " WHERE ";
+        String columnName = tableBatchConfiguration.getKeyColumnName();
+        String value = tableBatchConfiguration.getKeyColumnValue();
+        StringBuilder query = new StringBuilder();
+        query.append(select)
+                .append(numberOfRows)
+                .append(all)
+                .append(from)
+                .append(table)
+                .append(where)
+                .append(columnName)
+                .append("> '")
+                .append(value)
+                .append("' ;");
+        System.out.println(query.toString());
+        return query.toString();
+    }
 
-	private static final String primary_key = " PRIMARY KEY";
-	private static final String default_n = "(255)";
-	private static final String max_n = "(max)";
-	private static final String default_p = "(10)";
-	private static final String default_s = "(2)";
-	private static final String default_p_s = "(10, 2)";
-	private static final String nullable = " NULL";
-	private static final String not_nullable = " NOT NULL";
-	private static final String ID = "ID";
+    @Override
+    public List<String> generateListOfTableInsertQuery(List<Object[]> inserDatas) {
+        List<String> inserts = new ArrayList<>();
+        for (Object[] data : inserDatas) {
+            inserts.add(generateTableInsertQuery(data));
+        }
+        return inserts;
+    }
 
-	/**
-	 * @param column
-	 * @return
-	 */
-	private String generateColumnCreateString(SqlTableColumn column) {
-		String result = column.getName();
+    private static final String primary_key = " PRIMARY KEY";
+    private static final String default_n = "(255)";
+    private static final String max_n = "(max)";
+    private static final String default_p = "(10)";
+    private static final String default_s = "(2)";
+    private static final String default_p_s = "(10, 2)";
+    private static final String nullable = " NULL";
+    private static final String not_nullable = " NOT NULL";
+    private static final String ID = "ID";
 
-		String dataType = SqlDataTypes.convert(column.getDataType(), this.sourceDatabaseType,
-				this.destinationDatabaseType);
+    /**
+     * @param column
+     * @return
+     */
+    private String generateColumnCreateString(SqlTableColumn column) {
+        String result = column.getName();
 
-		if (dataType == null || dataType.equals("")) {
-			result = result.concat(SqlDataTypes.mssql_VARCHAR_n)
-					.concat(max_n)
-					.concat(column.getIsNullable() ? nullable : not_nullable);
+        String dataType = SqlDataTypes.convert(column.getDataType(), this.sourceDatabaseType,
+                this.destinationDatabaseType);
 
-			return result;
-		}
+        if (dataType == null || dataType.equals("")) {
+            result = result.concat(SqlDataTypes.mssql_VARCHAR_n)
+                    .concat(max_n)
+                    .concat(column.getIsNullable() ? nullable : not_nullable);
 
-		result = result.concat(" ").concat(dataType);
+            return result;
+        }
 
-		if (column.getCharacterMaximumLength() == null && column.getNumericPrecision() != null
-				&& column.getNumericScale() != null && column.getNumericScale() > 0) {
-			result = result.concat("(" + column.getNumericPrecision() + ", " + column.getNumericScale() + ")");
-		}
+        result = result.concat(" ").concat(dataType);
 
-		if (column.getCharacterMaximumLength() != null
-				&& (column.getNumericPrecision() == null && column.getNumericScale() == null)) {
-			result = result.concat("(" + column.getCharacterMaximumLength() + ")");
-		}
+        if (column.getCharacterMaximumLength() == null && column.getNumericPrecision() != null
+                && column.getNumericScale() != null && column.getNumericScale() > 0) {
+            result = result.concat("(" + column.getNumericPrecision() + ", " + column.getNumericScale() + ")");
+        }
 
-		if (column.getOrdinalPosition().equals(1) || column.getName().toUpperCase().equals(ID)) {
-			result = result.concat(primary_key);
-		}
+        if (column.getCharacterMaximumLength() != null
+                && (column.getNumericPrecision() == null && column.getNumericScale() == null)) {
+            result = result.concat("(" + column.getCharacterMaximumLength() + ")");
+        }
 
-		result = result.concat(column.getIsNullable() ? nullable : not_nullable);
+        if (column.getOrdinalPosition().equals(1) || column.getName().toUpperCase().equals(ID)) {
+            result = result.concat(primary_key);
+        }
 
-		return result;
-	}
+        result = result.concat(column.getIsNullable() ? nullable : not_nullable);
 
-	@Override
-	public String generateCreateTableQuery() {
-		if (this.columns.size() < 1) {
-			return "";
-		}
+        return result;
+    }
 
-		String createSQL = "CREATE TABLE";
-		createSQL = createSQL.concat(" IF NOT EXISTS ");
-		createSQL = createSQL.concat(
-				this.schemaName
-						+ "."
-						+ this.tableName
-						+ " (");
-		for (SqlTableColumn column : this.columns) {
-			createSQL = createSQL.concat(generateColumnCreateString(column));
-			createSQL = createSQL.concat(", ");
-		}
+    @Override
+    public String generateCreateTableQuery() {
+        if (this.columns.size() < 1) {
+            return "";
+        }
 
-		createSQL = createSQL.substring(0, createSQL.length() - 2);
-		createSQL = createSQL.concat(")");
+        String createSQL = "CREATE TABLE";
+        createSQL = createSQL.concat(" IF NOT EXISTS ");
+        createSQL = createSQL.concat(
+                this.schemaName
+                        + "."
+                        + this.tableName
+                        + " (");
+        for (SqlTableColumn column : this.columns) {
+            createSQL = createSQL.concat(generateColumnCreateString(column));
+            createSQL = createSQL.concat(", ");
+        }
 
-		return createSQL;
-	}
+        createSQL = createSQL.substring(0, createSQL.length() - 2);
+        createSQL = createSQL.concat(")");
 
-	@Override
-	public String generateCreateSchemaQuery(String schemaName) {
-		String query = "CREATE SCHEMA ";
-		query = query.concat("IF NOT EXISTS ");
-		query = query.concat(schemaName);
-		return query;
-	}
+        return createSQL;
+    }
 
-	@Override
-	public String generateInsertDataMap(List<Map<String, Object>> value) {
-		String fieldSqlString = "(";
-		String dataSqlString = "(";
+    @Override
+    public String generateCreateSchemaQuery(String schemaName) {
+        String query = "CREATE SCHEMA ";
+        query = query.concat("IF NOT EXISTS ");
+        query = query.concat(schemaName);
+        return query;
+    }
 
-		for (Map<String, Object> map : value) {
-			for (Entry<String, Object> entry : map.entrySet()) {
-				fieldSqlString = fieldSqlString.concat(entry.getKey()).concat(", ");
-				dataSqlString = dataSqlString.concat(entry.getKey()).concat(", ");
-			}
-		}
-		fieldSqlString = fieldSqlString.substring(0, fieldSqlString.length() - 2);
-		dataSqlString = dataSqlString.substring(0, dataSqlString.length() - 2);
-		fieldSqlString = fieldSqlString.concat(") ");
-		dataSqlString = dataSqlString.concat(") ");
+    @Override
+    public String generateInsertDataMap(List<Map<String, Object>> value) {
+        String fieldSqlString = "(";
+        String dataSqlString = "(";
 
-		String query = "insert into " + this.schemaName + "." + this.tableName + fieldSqlString + "values "
-				+ dataSqlString;
+        for (Map<String, Object> map : value) {
+            for (Entry<String, Object> entry : map.entrySet()) {
+                fieldSqlString = fieldSqlString.concat(entry.getKey()).concat(", ");
+                dataSqlString = dataSqlString.concat(entry.getKey()).concat(", ");
+            }
+        }
+        fieldSqlString = fieldSqlString.substring(0, fieldSqlString.length() - 2);
+        dataSqlString = dataSqlString.substring(0, dataSqlString.length() - 2);
+        fieldSqlString = fieldSqlString.concat(") ");
+        dataSqlString = dataSqlString.concat(") ");
 
-		return query;
-	}
+        String query = "insert into " + this.schemaName + "." + this.tableName + fieldSqlString + "values "
+                + dataSqlString;
+
+        return query;
+    }
+
+    @Override
+    public String generateSelectQuery(String schema, String table, TableBatchConfiguration tableBatchConfiguration) {
+        return null;
+    }
 
 }
