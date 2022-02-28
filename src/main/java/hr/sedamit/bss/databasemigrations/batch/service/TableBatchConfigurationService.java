@@ -19,7 +19,7 @@ public class TableBatchConfigurationService {
     public List<TableBatchConfiguration> list() {
         return tableBatchConfigurationRepository.findAll();
     }
-    
+
     public TableBatchConfiguration details(String name) {
         Optional<TableBatchConfiguration> tableBatchConfiguration = tableBatchConfigurationRepository.findByTableName(name);
         return tableBatchConfiguration.isPresent() ? tableBatchConfiguration.get() : null;
@@ -76,11 +76,7 @@ public class TableBatchConfigurationService {
 
 
     public void delete(String name) {
-        Optional<TableBatchConfiguration> optional = tableBatchConfigurationRepository.findByTableName(name);
-        if (optional.isPresent()) {
-            TableBatchConfiguration entity = optional.get();
-            tableBatchConfigurationRepository.delete(entity);
-        }
+        tableBatchConfigurationRepository.deleteById(name);
     }
 
 

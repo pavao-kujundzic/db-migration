@@ -8,8 +8,10 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -18,12 +20,13 @@ import java.util.HashMap;
 @Configuration
 @EnableJpaRepositories(
         basePackages = {"hr.sedamit.bss.databasemigrations.batch.repository"},
-        entityManagerFactoryRef = "batchEntityManagerFactory")
+        entityManagerFactoryRef = "batchEntityManagerFactory",
+        transactionManagerRef = "batchTransactionManager")
 public class BatchDatabaseConfiguration {
     @Autowired
     Environment env;
 
-    @Bean
+    @Bean(name = "batchEntityManagerFactory")
     @Autowired
     @Primary
     public LocalContainerEntityManagerFactoryBean batchEntityManagerFactory(@Qualifier("batchDataSource") DataSource postgreDataSource) {
@@ -54,5 +57,13 @@ public class BatchDatabaseConfiguration {
         driver.setPassword(env.getProperty("batch.datasource.password"));
         return driver;
     }
+
+    @Bean
+    @Primary
+    public PlatformTransactionManager batchTransactionManager(
+            @Qualifier("batchEntityManagerFactory") LocalContainerEntityManagerFactoryBean batchEntityManagerFactory) {
+        return new JpaTransactionManager(batchEntityManagerFactory.getObject());
+    }
+
 
 }

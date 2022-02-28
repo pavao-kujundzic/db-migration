@@ -1,0 +1,108 @@
+{
+	"info": {
+		"_postman_id": "549f06b9-9377-4b37-b005-997554045402",
+		"name": "db-migrations",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "table-batch-configuration",
+			"item": [
+				{
+					"name": "table-batch-configuration list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": null
+					},
+					"response": []
+				},
+				{
+					"name": "table-batch-configuration detail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{db-migration}}/api/v1/table-configuration/dbo.Termination_Call_Detail",
+							"host": [
+								"{{db-migration}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"table-configuration",
+								"dbo.Termination_Call_Detail"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "table-batch-configuration create",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": null
+					},
+					"response": []
+				},
+				{
+					"name": "table-batch-configuration update",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": null
+					},
+					"response": []
+				},
+				{
+					"name": "table-batch-configuration update last value",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": null
+					},
+					"response": []
+				},
+				{
+					"name": "table-batch-configuration delete",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": null
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "batch-job",
+			"item": [
+				{
+					"name": "Invoke job withTermination_Call_Detail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{db-migration}}/import/migrate?appendTables=dbo.Termination_Call_Detail",
+							"host": [
+								"{{db-migration}}"
+							],
+							"path": [
+								"import",
+								"migrate"
+							],
+							"query": [
+								{
+									"key": "appendTables",
+									"value": "dbo.Termination_Call_Detail"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

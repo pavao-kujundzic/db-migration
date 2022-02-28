@@ -7,7 +7,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface TableBatchConfigurationRepository extends JpaRepository<TableBatchConfiguration, Integer> {
+public interface TableBatchConfigurationRepository extends JpaRepository<TableBatchConfiguration, String> {
+
 
     Optional<TableBatchConfiguration> findByTableName(String tableName);
 
