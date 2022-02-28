@@ -34,7 +34,6 @@ public class TableBatchConfigurationService {
     }
 
 
-    @Transactional
     public TableBatchConfiguration update(String name, TableBatchConfiguration tableConfiguration) {
         Optional<TableBatchConfiguration> optional = tableBatchConfigurationRepository.findByTableName(name);
         if (optional.isPresent()) {
@@ -48,7 +47,7 @@ public class TableBatchConfigurationService {
         return null;
     }
 
-    @Transactional
+
     public TableBatchConfiguration updateLastColumnValue(String name, String keyColumnValue) {
         Optional<TableBatchConfiguration> optional = tableBatchConfigurationRepository.findByTableName(name);
         if (optional.isPresent()) {
@@ -59,7 +58,7 @@ public class TableBatchConfigurationService {
         return null;
     }
 
-    @Transactional
+
     public TableBatchConfiguration setActive(String name, boolean active) {
         Optional<TableBatchConfiguration> optional = tableBatchConfigurationRepository.findByTableName(name);
         if (optional.isPresent()) {
