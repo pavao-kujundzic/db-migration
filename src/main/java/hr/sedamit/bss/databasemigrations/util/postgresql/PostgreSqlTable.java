@@ -187,4 +187,10 @@ public class PostgreSqlTable extends SqlTable {
 		return listOfQuery;
 	}
 
+	@Override
+	public String generateLastRowQuery(String schema, String table, String idColumnName) {
+		return "SELECT * FROM " + schema + "." + table + " ORDER BY "
+				+ idColumnName + " DESC LIMIT 1";
+	}
+
 }

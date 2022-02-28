@@ -25,4 +25,6 @@ public interface SqlMethods {
 	public List<String> generateInsertDataMap(List<Map<String, Object>> value);
 
 	public String generateSelectQuery(String schema, String table, TableBatchConfiguration tableBatchConfiguration);
+
+	public String generateLastRowQuery(String schema, String table, String idColumnName);
 }

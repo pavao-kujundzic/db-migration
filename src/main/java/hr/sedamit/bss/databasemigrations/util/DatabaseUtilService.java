@@ -193,10 +193,9 @@ public class DatabaseUtilService {
 	 * 
 	 */
 	public Map<String, Object> fetchLastInsertRow() {
-		List<Map<String, Object>> result = sourceJdbcTemplate
+		List<Map<String, Object>> result = destinationJdbcTemplate
 				.queryForList(
-						"SELECT TOP 1 * FROM " + this.getSourceSchema() + "." + this.getSourceTable() + " ORDER BY "
-								+ getIdRowName() + " DESC");
+						this.getDestinationTable().generateLastRowQuery(sourceSchema, sourceTable, getIdRowName()));
 
 		if (result == null || result.size() < 1) {
 			LOGGER.error("fetchLastInsertRow returned 0 results!");
