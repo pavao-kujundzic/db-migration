@@ -46,6 +46,6 @@ public class DatabaseService {
 
 
     public String selectFromTable(String schema, String table, TableBatchConfiguration tableBatchConfiguration) {
-        return MsSqlTable.generateSelectQuerys(schema, table, tableBatchConfiguration);
+        return MsSqlTable.generateSelectQueries(schema, table, tableBatchConfiguration);
     }
 }

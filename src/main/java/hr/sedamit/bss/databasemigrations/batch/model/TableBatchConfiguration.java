@@ -13,8 +13,6 @@ import javax.persistence.Table;
 public class TableBatchConfiguration {
 
     @Id
-    private int id;
-
     @Column(name = "table_name")
     private String tableName;
     @Column(name = "batch_size")

@@ -61,10 +61,14 @@ public class SqlServerReader implements ItemReader<Map<String, List<Map<String, 
     }
 
     private List<Map<String, Object>> fetchTableRows(String table) {
-        TableBatchConfiguration tableBatchConfiguration = tableBatchConfigurationRepository.findByTableName(table);
-        String[] parts = table.split("\\.");
-        String query = databaseService.selectFromTable(parts[0], parts[1], tableBatchConfiguration);
-        List<Map<String, Object>> tableRows = sourceJdbcTemplate.queryForList(query);
-        return tableRows;
+        Optional<TableBatchConfiguration> tableBatchConfiguration = tableBatchConfigurationRepository.findByTableName(table);
+        if (tableBatchConfiguration.isPresent()) {
+            String[] parts = table.split("\\.");
+            String query = databaseService.selectFromTable(parts[0], parts[1], tableBatchConfiguration.get());
+            List<Map<String, Object>> tableRows = sourceJdbcTemplate.queryForList(query);
+            return tableRows;
+        } else {
+            return new ArrayList<>();
+        }
     }
 }

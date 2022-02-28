@@ -58,28 +58,28 @@ public class MsSqlTable extends SqlTable {
     }
 
 
-    public static String generateSelectQuerys(String schema, String tableName, TableBatchConfiguration tableBatchConfiguration) {
-        String select = "SELECT ";
+    public static String generateSelectQueries(String schema, String tableName, TableBatchConfiguration tableBatchConfiguration) {
         Integer batchSize = tableBatchConfiguration.getBatchSize();
         String numberOfRows = (batchSize.equals(null) || batchSize <= 0) ? " " : "TOP " + batchSize;
-        String all = " * ";
-        String from = "FROM ";
-        String table = schema + "." + tableName;
-        String where = " WHERE ";
-        String columnName = tableBatchConfiguration.getKeyColumnName();
         String value = tableBatchConfiguration.getKeyColumnValue();
         StringBuilder query = new StringBuilder();
-        query.append(select)
+        query.append("SELECT ")
                 .append(numberOfRows)
-                .append(all)
-                .append(from)
-                .append(table)
-                .append(where)
-                .append(columnName)
-                .append("> '")
-                .append(value)
-                .append("' ;");
-        System.out.println(query.toString());
+                .append(" * ")
+                .append("FROM ")
+                .append(schema + "." + tableName);
+        if (value != null && value != "") {
+            query.append(" WHERE ")
+                    .append(tableBatchConfiguration.getKeyColumnName())
+                    .append(" > ");
+            if (value.matches("[0-9]+\\.[0-9]+") || value.matches("[0-9]+")) {
+                query.append(value);
+            } else {
+                query.append("'" + value + "'");
+            }
+        }
+        query.append(";");
+        System.out.println(query);
         return query.toString();
     }
 

@@ -24,7 +24,6 @@ public class MigrationProcessor implements ItemProcessor
 
     @Override
     public Map<String, List<Map<String, Object>>> process(Map<String, List<Map<String, Object>>> data) throws Exception {
-
         return data;
     }
 }
