@@ -45,7 +45,7 @@ public class PostgreWriter implements ItemWriter<Map<String, List<Map<String, Ob
 		LOGGER.info("writer start...");
 		for (Map<String, List<Map<String, Object>>> job : data) {
 			for (Entry<String, List<Map<String, Object>>> table : job.entrySet()) {
-				String[] name = table.getKey() != null ? table.getKey().split(".") : null;
+				String[] name = table.getKey() != null ? table.getKey().split("\\.") : null;
 				if (name != null && name.length > 1) {
 					String tableName = name[1];
 					String schemaName = name[0];

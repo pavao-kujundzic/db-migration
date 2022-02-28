@@ -64,10 +64,17 @@ public class SqlTableBuilder {
 				column.get(SqlTableMetadata.getNumericPrecision(sourceDatabaseType)) != null
 						? column.get(SqlTableMetadata.getNumericPrecision(sourceDatabaseType))
 						: null);
-		sqlTableColumn.setIsNullable(
-				column.get(SqlTableMetadata.getIsNullable(sourceDatabaseType)) != null
-						? Boolean.valueOf((String) column.get(SqlTableMetadata.getIsNullable(sourceDatabaseType)))
-						: true);
+
+		if (column.get(SqlTableMetadata.getIsNullable(sourceDatabaseType)) != null) {
+			if (((String) column.get(SqlTableMetadata.getIsNullable(sourceDatabaseType))).equals("YES")) {
+				sqlTableColumn.setIsNullable(true);
+			} else {
+				sqlTableColumn.setIsNullable(false);
+			}
+		} else {
+			sqlTableColumn.setIsNullable(true);
+		}
+
 		sqlTableColumn.setCharacterMaximumLength(
 				column.get(SqlTableMetadata.getCharacterMaximumLength(sourceDatabaseType)) != null
 						? (Integer) column.get(SqlTableMetadata.getCharacterMaximumLength(sourceDatabaseType))

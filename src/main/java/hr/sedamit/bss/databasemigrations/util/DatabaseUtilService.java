@@ -143,12 +143,15 @@ public class DatabaseUtilService {
 	}
 
 	public boolean insertDataMap(List<Map<String, Object>> data) {
-		try {
-			String insertString = this.destinationTable.generateInsertDataMap(data);
-			destinationJdbcTemplate.execute(insertString);
-		} catch (DataAccessException e) {
-			return false;
-		}
+		List<String> insertString = this.destinationTable.generateInsertDataMap(data);
+		insertString.stream().forEach(query -> {
+			try {
+				destinationJdbcTemplate.execute(query);
+			} catch (DataAccessException e) {
+				LOGGER.error("ERROR...insertDataMap");
+				LOGGER.error(e.getMessage());
+			}
+		});
 
 		return true;
 	}

@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import hr.sedamit.bss.databasemigrations.batch.model.TableBatchConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import hr.sedamit.bss.databasemigrations.batch.model.TableBatchConfiguration;
 import hr.sedamit.bss.databasemigrations.util.common.SqlDataTypes;
 import hr.sedamit.bss.databasemigrations.util.common.SqlTable;
 import hr.sedamit.bss.databasemigrations.util.common.SqlTableColumn;
@@ -156,25 +156,35 @@ public class PostgreSqlTable extends SqlTable {
 	}
 
 	@Override
-	public String generateInsertDataMap(List<Map<String, Object>> value) {
-		String fieldSqlString = "(";
-		String dataSqlString = "(";
+	public List<String> generateInsertDataMap(List<Map<String, Object>> value) {
+		List<String> listOfQuery = new ArrayList<>();
 
 		for (Map<String, Object> map : value) {
+			String fieldSqlString = "(";
+			String dataSqlString = "(";
 			for (Entry<String, Object> entry : map.entrySet()) {
 				fieldSqlString = fieldSqlString.concat(entry.getKey()).concat(", ");
-				dataSqlString = dataSqlString.concat(entry.getKey()).concat(", ");
+				Object str = entry.getValue();
+				if (str == null) {
+					dataSqlString = dataSqlString.concat("null").concat(", ");
+				} else if (str instanceof Number) {
+					dataSqlString = dataSqlString.concat(str.toString()).concat(", ");
+				} else {
+					dataSqlString = dataSqlString.concat("'" + str.toString() + "'").concat(", ");
+				}
 			}
+			fieldSqlString = fieldSqlString.substring(0, fieldSqlString.length() - 2);
+			dataSqlString = dataSqlString.substring(0, dataSqlString.length() - 2);
+			fieldSqlString = fieldSqlString.concat(") ");
+			dataSqlString = dataSqlString.concat("); ");
+
+			String query = "insert into " + this.schemaName + "." + this.tableName + fieldSqlString + "values "
+					+ dataSqlString;
+
+			listOfQuery.add(query);
 		}
-		fieldSqlString = fieldSqlString.substring(0, fieldSqlString.length() - 2);
-		dataSqlString = dataSqlString.substring(0, dataSqlString.length() - 2);
-		fieldSqlString = fieldSqlString.concat(") ");
-		dataSqlString = dataSqlString.concat(") ");
 
-		String query = "insert into " + this.schemaName + "." + this.tableName + fieldSqlString + "values "
-				+ dataSqlString;
-
-		return query;
+		return listOfQuery;
 	}
 
 }
