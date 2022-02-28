@@ -5,8 +5,8 @@ import hr.sedamit.bss.databasemigrations.listener.DestinationWriterListener;
 import hr.sedamit.bss.databasemigrations.listener.JobCompletionNotificationListener;
 import hr.sedamit.bss.databasemigrations.source.entity.SqlServerEntity;
 import hr.sedamit.bss.databasemigrations.step.MigrationProcessor;
-import hr.sedamit.bss.databasemigrations.step.PostgreWriter;
-import hr.sedamit.bss.databasemigrations.step.SqlServerReader;
+import hr.sedamit.bss.databasemigrations.step.MigrationWriter;
+import hr.sedamit.bss.databasemigrations.step.MigrationReader;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -27,11 +27,11 @@ import java.util.Map;
 public class BatchJobConfiguration {
 
     @Autowired
-    private SqlServerReader sqlServerReader;
+    private MigrationReader sqlServerReader;
     @Autowired
     private MigrationProcessor migrationProcessor;
     @Autowired
-    private PostgreWriter postgreWriter;
+    private MigrationWriter postgreWriter;
     @Autowired
     public JobBuilderFactory jobBuilderFactory;
     @Autowired

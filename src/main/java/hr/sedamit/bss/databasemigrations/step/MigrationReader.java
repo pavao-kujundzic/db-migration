@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 
 @Component
 @StepScope
-public class SqlServerReader implements ItemReader<Map<String, List<Map<String, Object>>>> {
+public class MigrationReader implements ItemReader<Map<String, List<Map<String, Object>>>> {
 
     @Autowired
     @Qualifier("sourceJdbcTemplate")

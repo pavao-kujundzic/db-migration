@@ -14,8 +14,8 @@ import lombok.Setter;
  * Created by J0ka on 22/02/22
  *
  */
-@Getter(AccessLevel.PROTECTED)
-@Setter(AccessLevel.PROTECTED)
+@Getter(AccessLevel.PUBLIC)
+@Setter(AccessLevel.PUBLIC)
 public abstract class SqlTable implements SqlMethods {
 	protected DatabaseType sourceDatabaseType;
 	protected DatabaseType destinationDatabaseType;

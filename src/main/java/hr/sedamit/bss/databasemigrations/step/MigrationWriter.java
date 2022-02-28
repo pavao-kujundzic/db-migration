@@ -3,9 +3,11 @@ package hr.sedamit.bss.databasemigrations.step;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.annotation.AfterWrite;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +17,15 @@ import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import hr.sedamit.bss.databasemigrations.batch.model.TableBatchConfiguration;
+import hr.sedamit.bss.databasemigrations.batch.repository.TableBatchConfigurationRepository;
 import hr.sedamit.bss.databasemigrations.util.DatabaseUtilService;
 
 @Component
 @StepScope
-public class PostgreWriter implements ItemWriter<Map<String, List<Map<String, Object>>>> {
+public class MigrationWriter implements ItemWriter<Map<String, List<Map<String, Object>>>> {
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(PostgreWriter.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(MigrationWriter.class);
 
 	@Autowired
 	private Environment env;
@@ -40,6 +44,11 @@ public class PostgreWriter implements ItemWriter<Map<String, List<Map<String, Ob
 	@Value("#{jobParameters['appendTables']}")
 	private String appendTablesString;
 
+	@Autowired
+	private TableBatchConfigurationRepository tableBatchConfigurationRepository;
+
+	private DatabaseUtilService databaseUtilService;
+
 	@Override
 	public void write(List<? extends Map<String, List<Map<String, Object>>>> data) throws Exception {
 		LOGGER.info("writer start...");
@@ -50,7 +59,7 @@ public class PostgreWriter implements ItemWriter<Map<String, List<Map<String, Ob
 					String tableName = name[1];
 					String schemaName = name[0];
 
-					DatabaseUtilService service = new DatabaseUtilService(
+					databaseUtilService = new DatabaseUtilService(
 							env.getProperty("batch.destination.datasource.driver"),
 							env.getProperty("batch.source.datasource.driver"),
 							sourceJdbcTemplate,
@@ -58,11 +67,28 @@ public class PostgreWriter implements ItemWriter<Map<String, List<Map<String, Ob
 							schemaName,
 							tableName);
 
-					service.createTable(false);
-					service.insertDataMap(table.getValue());
+					databaseUtilService.createTable(false);
+					databaseUtilService.insertDataMap(table.getValue());
 				}
 			}
 		}
 		LOGGER.info("writer end...");
+	}
+
+	@AfterWrite
+	public void test() {
+		LOGGER.info("@AfterWrite start...");
+		Map<String, Object> lastInsert = databaseUtilService.fetchLastInsertRow();
+
+		Optional<TableBatchConfiguration> tableConfigurationOptional = tableBatchConfigurationRepository
+				.findByTableName(databaseUtilService.getSourceSchema() + "." + databaseUtilService.getSourceTable());
+
+		if (tableConfigurationOptional.isPresent() && lastInsert != null) {
+			TableBatchConfiguration tableBatchConfiguration = tableConfigurationOptional.get();
+			tableBatchConfiguration
+					.setKeyColumnValue(lastInsert.get(tableBatchConfiguration.getKeyColumnName()).toString());
+
+			tableBatchConfigurationRepository.save(tableBatchConfiguration);
+		}
 	}
 }

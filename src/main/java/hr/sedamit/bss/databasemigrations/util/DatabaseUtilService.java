@@ -5,6 +5,7 @@ package hr.sedamit.bss.databasemigrations.util;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import hr.sedamit.bss.databasemigrations.util.common.DatabaseType;
 import hr.sedamit.bss.databasemigrations.util.common.SqlTable;
 import hr.sedamit.bss.databasemigrations.util.common.SqlTableBuilder;
+import hr.sedamit.bss.databasemigrations.util.common.SqlTableColumn;
 import hr.sedamit.bss.databasemigrations.util.common.SqlTableMetadata;
 import hr.sedamit.bss.databasemigrations.util.mssql.MsSqlTable;
 import hr.sedamit.bss.databasemigrations.util.postgresql.PostgreSqlTable;
@@ -173,6 +175,35 @@ public class DatabaseUtilService {
 		}
 
 		return result;
+	}
+
+	public String getIdRowName() {
+		Optional<SqlTableColumn> column = this.getDestinationTable().getColumns().stream()
+				.filter(tempColumn -> tempColumn.getOrdinalPosition().equals(1) && !tempColumn.getIsNullable())
+				.findFirst();
+
+		if (column.isPresent()) {
+			return column.get().getName();
+		}
+
+		return "";
+	}
+
+	/**
+	 * 
+	 */
+	public Map<String, Object> fetchLastInsertRow() {
+		List<Map<String, Object>> result = sourceJdbcTemplate
+				.queryForList(
+						"SELECT TOP 1 * FROM " + this.getSourceSchema() + "." + this.getSourceTable() + " ORDER BY "
+								+ getIdRowName() + " DESC");
+
+		if (result == null || result.size() < 1) {
+			LOGGER.error("fetchLastInsertRow returned 0 results!");
+			return null;
+		}
+
+		return result.get(0);
 	}
 
 }
